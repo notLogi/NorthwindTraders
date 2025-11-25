@@ -1,26 +1,48 @@
 package com.pluralsight;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
-
 import java.sql.*;
 
 public class NorthwindTraders {
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    public static void main(String[] args) {
+        try {
+            if (args.length != 2) {
+                System.out.println("Application needs a username and password to run.");
+                System.exit(1);
+            }
 
-        Connection connection;
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", "root", "yearup");
+            String username = args[0];
+            String password = args[1];
 
-        Statement statement = connection.createStatement();
-        String query = """
-                SELECT * FROM products
-                """;
-        ResultSet results = statement.executeQuery(query);
+            Class.forName("com.mysql.cj.jdbc.Driver");
 
-        while(results.next()){
-            String productName = results.getString("ProductName");
-            System.out.println(productName);
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password);
+
+            String query = """
+                    SELECT ProductID, ProductName, UnitPrice, UnitsInStock FROM products
+                    """;
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            ResultSet results = preparedStatement.executeQuery();
+
+            while (results.next()) {
+                System.out.printf("""
+                                Product ID: %s%n\
+                                Name: %s%n\
+                                Price: %.2f%n\
+                                Stock: %d%n%n------------------
+                                
+                                """,
+                        results.getString("ProductID"),
+                        results.getString("ProductName"),
+                        results.getDouble("UnitPrice"),
+                        results.getInt("UnitsInStock"));
+            }
+            results.close();
+            preparedStatement.close();
+            connection.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-     connection.close();
     }
 }
