@@ -27,13 +27,13 @@ public class NorthwindTraders {
 
             while (results.next()) {
                 System.out.printf("""
-                                Product ID: %s%n\
+                                Product ID: %d%n\
                                 Name: %s%n\
                                 Price: %.2f%n\
                                 Stock: %d%n%n------------------
                                 
                                 """,
-                        results.getString("ProductID"),
+                        results.getInt("ProductID"),
                         results.getString("ProductName"),
                         results.getDouble("UnitPrice"),
                         results.getInt("UnitsInStock"));
